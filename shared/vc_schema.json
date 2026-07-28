@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+
+  "title": "KYC Verifiable Credential",
+
+  "type": "object",
+
+  "required": [
+    "@context",
+    "type",
+    "issuer",
+    "credentialSubject",
+    "proof"
+  ],
+
+  "properties": {
+
+    "@context": {
+      "type": "array"
+    },
+
+
+    "type": {
+      "type": "array"
+    },
+
+
+    "issuer": {
+      "type": "object"
+    },
+
+
+    "credentialSubject": {
+
+      "type": "object",
+
+      "required": [
+
+        "family_name",
+        "given_name",
+        "birth_date",
+        "birth_place",
+        "nationality",
+        "document_number",
+        "portrait"
+
+      ],
+
+
+      "properties": {
+
+        "family_name": {
+          "type": "string"
+        },
+
+        "given_name": {
+          "type": "string"
+        },
+
+        "birth_date": {
+          "type": "string"
+        },
+
+        "birth_place": {
+          "type": "string"
+        },
+
+        "nationality": {
+          "type": "array"
+        },
+
+        "resident_address": {
+          "type": "string"
+        },
+
+        "personal_administrative_number": {
+          "type": "string"
+        },
+
+        "document_number": {
+          "type": "string"
+        },
+
+        "portrait": {
+          "type": "string"
+        }
+
+      }
+
+    },
+
+
+    "proof": {
+
+      "type": "object",
+
+      "required": [
+        "type",
+        "signature"
+      ]
+
+    }
+
+  }
+}

@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# IDE
+.idea/
+
+# Environment
+.env
+
+# Generated credentials
+credential.json
+data/credential.json
+
+# Keys
+private_key.pem
+
+wallet/wallet.json
+*.pem

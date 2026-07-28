@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  issuer:
+    build:
+      context: ./issuer
+    container_name: kyc-issuer
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./issuer:/app
+    working_dir: /app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+
+
+  verifier:
+    build:
+      context: ./verifier
+    container_name: kyc-verifier
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./verifier:/app
+    working_dir: /app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
+
+
+  wallet:
+    build:
+      context: ./wallet
+    container_name: kyc-wallet
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./wallet:/app
+    working_dir: /app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000
