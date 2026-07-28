@@ -933,3 +933,163 @@ h3 {
     gap: 12px;
   }
 }
+
+/* Download Card & Issue Button Styles */
+.issue-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.issue-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.download-card {
+  margin-top: 28px;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.download-card-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.download-card-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.download-card-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #4ade80;
+}
+
+.download-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #4ade80;
+}
+
+.download-card-sub {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.download-label {
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.download-btns {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.dl-btn {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.dl-btn-json {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+
+}
+
+.dl-btn-json:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+}
+
+.dl-btn-jwt {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  color: white;
+}
+
+.dl-btn-jwt:hover {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+  transform: translateY(-1px);
+}
+
+.dl-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  margin-left: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.dl-preview-toggle {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.dl-preview-toggle:hover {
+  color: #c084fc;
+}
+
+.dl-preview {
+  margin-top: 10px;
+  padding: 14px;
+  background: rgba(10, 11, 20, 0.9);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+  font-size: 11px;
+  color: #a7f3d0;
+  max-height: 250px;
+  overflow-y: auto;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+}

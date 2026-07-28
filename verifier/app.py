@@ -16,7 +16,6 @@ BASE_DIR = Path(__file__).resolve().parent
 PUBLIC_KEY_PATH = BASE_DIR / "public_key.pem"
 
 
-# Chargement clé publique RSA
 with open(PUBLIC_KEY_PATH, "rb") as f:
     PUBLIC_KEY = serialization.load_pem_public_key(
         f.read()
@@ -51,13 +50,11 @@ def verify(data: CredentialRequest):
 
     try:
 
-        # Récupération signature
         signature = base64.b64decode(
             credential["proof"]["signature"]
         )
 
 
-        # Retirer proof avant vérification
         unsigned = credential.copy()
 
         unsigned.pop(
@@ -66,7 +63,6 @@ def verify(data: CredentialRequest):
         )
 
 
-        # Même format que l'issuer
         payload = json.dumps(
             unsigned,
             sort_keys=True,
@@ -75,7 +71,6 @@ def verify(data: CredentialRequest):
 
 
 
-        # Vérification RSA
         PUBLIC_KEY.verify(
 
             signature,
@@ -90,7 +85,6 @@ def verify(data: CredentialRequest):
 
 
 
-        # Vérification champs obligatoires
         required_fields = [
             "family_name",
             "given_name",
@@ -126,7 +120,6 @@ def verify(data: CredentialRequest):
 
 
 
-        # Vérification expiration
         if "validUntil" in credential:
 
             expiry = datetime.fromisoformat(

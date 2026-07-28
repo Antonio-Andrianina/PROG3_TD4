@@ -19,4 +19,5 @@ data/credential.json
 private_key.pem
 
 wallet/wallet.json
+wallet/verification_history.json
 *.pem

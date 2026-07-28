@@ -1,7 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { createCredentialOffer } from "./api";
+import { createCredentialOffer, issueCredential, fetchJwtCredential } from "./api";
 import OfflineVerifier from "./components/OfflineVerifier";
 
 function App() {
@@ -24,6 +24,10 @@ function App() {
   });
 
   const [offer, setOffer] = useState("");
+  const [issuedCredential, setIssuedCredential] = useState(null);
+  const [jwtCredential, setJwtCredential] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   function handleChange(e) {
     setForm({
@@ -32,18 +36,62 @@ function App() {
     });
   }
 
+  function downloadJSON() {
+    if (!issuedCredential) return;
+    const name = issuedCredential.credentialSubject?.family_name || "credential";
+    const blob = new Blob([JSON.stringify(issuedCredential, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vc_${name.toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadJWT() {
+    if (!jwtCredential) return;
+    const name = issuedCredential?.credentialSubject?.family_name || "credential";
+    const blob = new Blob([jwtCredential], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vc_${name.toLowerCase()}.jwt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleSubmit() {
+    setLoading(true);
+    setIssuedCredential(null);
+    setJwtCredential("");
+    setOffer("");
     try {
-      const result = await createCredentialOffer({
-        ...form,
-        nationality: [form.nationality],
-      });
+      const identity = { ...form, nationality: [form.nationality] };
 
-      setOffer(result.credential_offer_uri);
+      const [offerResult, jsonVC] = await Promise.all([
+        createCredentialOffer(identity),
+        issueCredential(identity),
+      ]);
 
+      setOffer(offerResult.credential_offer_uri);
+      setIssuedCredential(jsonVC);
+
+      const preAuthCode =
+        offerResult.credential_offer?.grants?.[
+          "urn:ietf:params:oauth:grant-type:pre-authorized_code"
+        ]?.["pre-authorized_code"];
+
+      if (preAuthCode) {
+        const jwt = await fetchJwtCredential(preAuthCode);
+        setJwtCredential(jwt);
+      }
     } catch (error) {
       console.error(error);
-      alert("Erreur création du Verifiable Credential");
+      alert("Erreur lors de la création du Verifiable Credential");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -175,16 +223,79 @@ function App() {
                 <button
                     type="button"
                     onClick={handleSubmit}
+                    disabled={loading}
+                    className="issue-btn"
                 >
-                  Générer le Verifiable Credential
+                  {loading ? (
+                    <><span className="ov-spinner" /> Génération en cours...</>
+                  ) : (
+                    <>&#10003;&nbsp; Générer le Verifiable Credential</>
+                  )}
                 </button>
 
               </form>
 
+              {issuedCredential && (
+                <div className="download-card">
+                  <div className="download-card-header">
+                    <div className="download-card-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <polyline points="9 12 11 14 15 10" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="download-card-title">Credential généré avec succès ✓</p>
+                      <p className="download-card-sub">
+                        {issuedCredential.credentialSubject?.given_name} {issuedCredential.credentialSubject?.family_name}
+                        &nbsp;•&nbsp; valide jusqu'au {issuedCredential.credentialSubject?.expiry_date}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="download-label">Télécharger pour vérification ultérieure :</p>
+
+                  <div className="download-btns">
+                    <button className="dl-btn dl-btn-json" onClick={downloadJSON}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                      </svg>
+                      Télécharger .json
+                      <span className="dl-badge">RSA-SHA256</span>
+                    </button>
+
+                    {jwtCredential && (
+                      <button className="dl-btn dl-btn-jwt" onClick={downloadJWT}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                          <polyline points="7 10 12 15 17 10" />
+                          <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Télécharger .jwt
+                        <span className="dl-badge">ES256 · JWT-VC</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <button
+                    className="dl-preview-toggle"
+                    onClick={() => setShowPreview(v => !v)}
+                  >
+                    {showPreview ? "▲ Masquer" : "▼ Aperçu JSON"}
+                  </button>
+
+                  {showPreview && (
+                    <pre className="dl-preview">{JSON.stringify(issuedCredential, null, 2)}</pre>
+                  )}
+                </div>
+              )}
+
               {offer && (
                   <div className="qr-section">
 
-                    <h3>Scanner avec le Wallet</h3>
+                    <h3>Scanner avec le Wallet (OID4VCI)</h3>
 
                     <div className="qr-box">
                       <QRCodeSVG
